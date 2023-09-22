@@ -36,7 +36,17 @@ func echo(w http.ResponseWriter, r *http.Request) {
 		
 		// 受信したメッセージに応答してメッセージをJSONに変換して送信。
 		responseMessage := "僕の名前はAI。よろしくね"
-		responseJSON, err := json.Marshal(map[string]string{"content": responseMessage})
+		responseJSON, err := json.Marshal(map[string]string{
+			"messageId": "",
+			"userId": "",
+			"contents": responseMessage,
+			"senderType": "1",
+			"postCategoryType": "0",
+			"tarotMasterId": "",
+			"createdAt": "",
+			"updatedAt": "",
+			"isDeleted": "",
+		})
 		if err != nil {
 			fmt.Printf("JSON marshalling error: %s\n", err)
 			break
