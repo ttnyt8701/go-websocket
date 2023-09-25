@@ -7,6 +7,12 @@ import (
 	"encoding/json"
 
 )
+
+type ClientMessage struct {
+	Contents string `json:"contents"`
+	UserId   string `json:"userId"`
+}
+
 // ハンドシェイクのカスタマイズ
 var upgrader = websocket.Upgrader{
 	// クライアントのオリジンの検証
@@ -32,16 +38,25 @@ func echo(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("Read message error: %s\n", err)
 			break
 		}
-		fmt.Printf("Received message: %s\n", msg)
+
+		var clientMsg ClientMessage
+		err = json.Unmarshal(msg, &clientMsg)
+		if err != nil {
+			fmt.Printf("JSON Unmarshal error: %s\n", err)
+			break
+		}
+
+		fmt.Printf("Received message: %s from userId: %s\n", clientMsg.Contents, clientMsg.UserId)
+
 		
 		// 受信したメッセージに応答してメッセージをJSONに変換して送信。
-		responseMessage := "僕の名前はAI。よろしくね"
-		responseJSON, err := json.Marshal(map[string]string{
+		responseMessage := "contents:" + clientMsg.Contents + "\n" +"UserId:" + clientMsg.UserId 
+		responseJSON, err := json.Marshal(map[string]interface{}{
 			"messageId": "",
-			"userId": "",
+			"userId": clientMsg.UserId ,
 			"contents": responseMessage,
-			"senderType": "1",
-			"postCategoryType": "0",
+			"senderType": 2,
+			"postCategoryType": 0,
 			"tarotMasterId": "",
 			"createdAt": "",
 			"updatedAt": "",
